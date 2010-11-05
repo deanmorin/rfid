@@ -1,63 +1,27 @@
-#include <stdio.h>
-#include <windows.h>
-/*
-SOURCE FILE:     EscapeSequence.c - This contains all the functions necessary
---                                     to parse an escaped control sequence.
+#include "ErrorDetect.h"
+
+/*---------------------------------------------------------------
+-- SOURCE FILE:    ErrorDetect.c
 --
 -- PROGRAM:     Advanced Terminal Emulator Pro
 --
 -- FUNCTIONS:
---              BOOL	CheckDigits(HWND hWnd, CHAR* psBuffer, 
---                                  DWORD length, DWORD *i);
---              BOOL	CheckDigitsQ(HWND hWnd, CHAR* psBuffer, 
---                                   DWORD length, DWORD *i);
---              BOOL	CheckDigitsSemi(HWND hWnd, CHAR* psBuffer, 
---                                      DWORD length, DWORD *i);
---              DWORD	GetDigit(CHAR* psBuffer, DWORD length, DWORD *i);
---              VOID    ProcessEsc(HWND hWnd, CHAR* psBuffer, 
---                                 DWORD dwBytesRead);
---              VOID    ProcessFont(HWND hWnd);
---              BOOL	ProcessParen(CHAR* psBuffer, DWORD length, DWORD *i);
---              BOOL	ProcessSquare(HWND hWnd, CHAR* psBuffer, 
---                                    DWORD length, DWORD *i);
+--              BOOL DetectLRCError(CHAR* pcPacket, DWORD dwLength)
 --
 --
--- DATE:        Oct 19, 2010
+-- DATE:        Nov 2, 2010
 --
 -- REVISIONS:   (Date and Description)
 --
--- DESIGNER:    Marcel Vangrootheest
+-- DESIGNER:    Dean Morin, Marcel Vangrootheest
 --
--- PROGRAMMER:  Marcel Vangrootheest
---
--- NOTES:
-
-
-FUNCTION:    ProcessEsc
---
--- DATE:        Oct 17, 2010
---
--- REVISIONS:   (Date and Description)
---
--- DESIGNER:    Marcel Vangrootheest
---
--- PROGRAMMER:  Marcel Vangrootheest
---
--- INTERFACE:   VOID ProcessEsc(HWND hWnd, CHAR* psBuffer, DWORD length)
---								hWnd		- Handle to the window
---								psBuffer	- Array of chars to be processed
---								length		- Number of chars to process
---
--- RETURNS:     VOID
+-- PROGRAMMER:	Ian Lee
 --
 -- NOTES:
---              Processes an Escape sequence. If a valid sequence is encountered
---				it will either end or send the rest of the array to ProcessRead.
---				If it is invalid it will send the invalid character plus the
---				rest of the array to ProcessRead. If it is incomplete it will
---				save the current sequence and another Read will be done to later
---				process the rest of the sequence.
-
+--
+--				Handles the LRC error checking on frames passed into the program
+--
+----------------------------------------------------------------*/
 
 /*---------------------------------------------------------------
 --FUNCTION: 	DetectLRCError
@@ -81,8 +45,16 @@ FUNCTION:    ProcessEsc
 --
 --				Performs LRC Error checking on the frame.  
 
-
-
+				1. XOR the first byte with the second byte, then the result of 
+					that with the third byte, and so on until all bytes except 
+					for the final two have been XOR’d. 
+				2. If the result of this is not the same as the second to last 
+					byte: 
+					A. return true 
+				3. XOR the second to last byte with ‘FF’ 
+				4. If the result of this is not the same as the last byte: 
+					A. return true 
+				5. return false 
 
 ----------------------------------------------------------------*/
 BOOL DetectLRCError(CHAR* pcPacket, DWORD dwLength){
@@ -102,21 +74,3 @@ BOOL DetectLRCError(CHAR* pcPacket, DWORD dwLength){
 	}
 	return FALSE;
 }
-
-
-/*
-int main(void){
-	char a[]={(char)0x1,(char)0x9,(char)0x0,
-			(char)0x3,(char)0x1,(char)0x41,
-			(char) 0x1,(char)0x4A,(char)0xB5};
-	
-	
-	if(DetectLRCError(a,9)){
-		printf("error");
-	}
-	else 
-		printf("no error");
-	return 0;
-	
-}
-*/
