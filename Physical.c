@@ -60,7 +60,7 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     COMSTAT         cs                      = {0};
 	BOOL			requestPending 			= FALSE;
 	DWORD			dwLength 				= 0;
-	CHAR*			pcPacket				={0};
+	CHAR			pcPacket[20]			={0};
 	DWORD i;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
@@ -93,7 +93,7 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
             if (dwBytesRead > 2) {
                 // read completed successfully
 				dwLength = psReadBuf[1];
-				if(dwBytesRead == dwLength){
+				if(dwBytesRead >= dwLength){
 					for(i = 0; i < dwLength; i++){
 						pcPacket[i] = psReadBuf[i];
 					}

@@ -136,15 +136,15 @@ BOOL RequestPacket(HWND hWnd) {
     UINT        bufLength       = 1;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
-    psWriteBuf[0] = (char)'0x01';
-	psWriteBuf[1] = (char)'0x09';
-	psWriteBuf[2] = (char)'0x00';
-	psWriteBuf[3] = (char)'0x03';
-	psWriteBuf[4] = (char)'0x01';
-	psWriteBuf[5] = (char)'0x41';
-	psWriteBuf[6] = (char)'0x00'; //change to 0x00 for infinite loop
-	psWriteBuf[7] = (char)'0x4B'; //update error correction
-	psWriteBuf[8] = (char)'0xB4'; //update error correction
+    psWriteBuf[0] = 0x01;
+	psWriteBuf[1] = 0x09;
+	psWriteBuf[2] = 0x00;
+	psWriteBuf[3] = 0x03;
+	psWriteBuf[4] = 0x01;
+	psWriteBuf[5] = 0x41;
+	psWriteBuf[6] = 0x00; //change to 0x00 for infinite loop
+	psWriteBuf[7] = 0x4B; //update error correction
+	psWriteBuf[8] = 0xB4; //update error correction
 
     if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
         if (GetLastError() != ERROR_IO_PENDING) {
@@ -276,9 +276,9 @@ VOID ProcessSpecialChar(HWND hWnd, CHAR cSpChar) {
 VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	PWNDDATA pwd = NULL;
 	
-	CHAR* pcToken;
+	CHAR pcToken[512];
 	DWORD dwTokenLength = 0;
-	CHAR pcData[8];
+	CHAR pcData[512];
 	DWORD dwDataLength = 0;
 	DWORD j, i;
 	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
@@ -286,9 +286,9 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	/*if(DetectLRCError(hWnd, pcPacket, dwLength)){
 		//display error packet error
 	}*/
-	switch(pcPacket[6]){
-		case '0x04':
-			if(pcPacket[7] == '0x00' && pcPacket[8] == '0x00'){
+	switch(pcPacket[7]){
+		case 0x04:
+			if(pcPacket[8] == 0x00 && pcPacket[9] == 0x00){
 				pcToken = "ISO 15693";
 				dwTokenLength = strlen(pcToken);
 				dwDataLength = 8;
@@ -302,8 +302,8 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 				//display error unsupported token
 			}
 			return;
-		case '0x05':
-			if(pcPacket[7] == '0x02' && pcPacket[8] == '0x24'){
+		case 0x05:
+			if(pcPacket[8] == 0x02 && pcPacket[9] == 0x24){
 				pcToken = "TAG-IT HF";
 				dwTokenLength = strlen(pcToken);
 				dwDataLength = 4;
@@ -315,8 +315,8 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 				//display error unsupported token
 			}
 			return;
-		case '0x06':
-			if(pcPacket[7] == '0xFE'){
+		case 0x06:
+			if(pcPacket[8] == 0xFE){
 				pcToken = "LF R/W";
 				dwTokenLength = strlen(pcToken);
 				dwDataLength = 8;
