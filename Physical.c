@@ -58,6 +58,10 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     DWORD           dwEvent                 = 0;
     DWORD           dwError                 = 0;
     COMSTAT         cs                      = {0};
+	BOOL			requestPending 			= FALSE;
+	DWORD			dwLength 				= 0;
+	CHAR*			pcPacket				={0};
+	DWORD i;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
     if ((overlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL) {
@@ -70,22 +74,36 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
         if (!WaitCommEvent(pwd->hPort, &dwEvent, &overlap)) {
             ProcessCommError(pwd->hPort);
         }
+		if(!requestPending){
+			RequestPacket(hWnd);
+			requestPending = TRUE;
+		}
         WaitForSingleObject(overlap.hEvent, WAIT_TIME);
         ClearCommError(pwd->hPort, &dwError, &cs);
         
+		
         // ensures that there is a character at the port
-        if (cs.cbInQue) {                       
+        if (cs.cbInQue) {  
             if (!ReadFile(pwd->hPort, psReadBuf, cs.cbInQue, 
                           &dwBytesRead, &overlap)) {
                 // read is incomplete or had an error
                 ProcessCommError(pwd->hPort);
                 GetOverlappedResult(pwd->hThread, &overlap, &dwBytesRead, TRUE);
             }             
-            if (dwBytesRead) {
+            if (dwBytesRead > 2) {
                 // read completed successfully
-                ProcessRead(hWnd, psReadBuf, dwBytesRead);
+				dwLength = psReadBuf[1];
+				if(dwBytesRead == dwLength){
+					for(i = 0; i < dwLength; i++){
+						pcPacket[i] = psReadBuf[i];
+					}
+					ProcessPacket(hWnd, pcPacket, dwLength);
+					memset(psReadBuf, 0, READ_BUFSIZE);
+					requestPending = FALSE;
+				}
                 InvalidateRect(hWnd, NULL, FALSE);
             }
+			
         }
         ResetEvent(overlap.hEvent);
     }

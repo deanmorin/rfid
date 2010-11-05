@@ -23,6 +23,7 @@ VOID    ScrollDown(HWND hWnd);
 VOID    ScrollUp(HWND hWnd);
 VOID    SetScrollRegion(HWND hWnd, INT cyTop, INT cyBottom); 
 VOID    UpdateDisplayBuf(HWND hWnd, CHAR cCharacter);
-
+BOOL	RequestPacket(HWND hWnd);
+VOID	ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength);
 
 #endif
