@@ -297,7 +297,7 @@ VOID Bell(HWND hWnd) {
         InvalidateRect(hWnd, NULL, TRUE);
  
     } else if (pwd->iBellSetting == IDM_BELL_AUR) {
-        PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);
+        //PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);
     }
 }
 

@@ -6,7 +6,7 @@
 --                               is to organize the functions intuitively, 
 --                               rather than pedantically.
 --                      
--- PROGRAM:     Advanced Terminal Emulator Pro
+-- PROGRAM:     RFID Reader Enterprise Edition
 --
 -- FUNCTIONS:
 --              DWORD WINAPI    ReadThreadProc(HWND);
@@ -32,7 +32,9 @@
 --
 -- DATE:        Oct 13, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   Nov 05, 2010
+--              Modified the function to also listen for a "disconnect" event,
+--              ond to break in that case.
 --
 -- DESIGNER:    Dean Morin
 --
@@ -58,11 +60,14 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     DWORD           dwEvent                 = 0;
     DWORD           dwError                 = 0;
     COMSTAT         cs                      = {0};
+    HANDLE          hEvents[2]              = {0};
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
     if ((overlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL) {
         DISPLAY_ERROR("Error creating event in read thread");
     }
+    hEvents[0] = overlap.hEvent;
+    hEvents[1] = OpenEvent(DELETE | SYNCHRONIZE, FALSE, TEXT("disconnected"));
 
     while (pwd->bConnected) {
 
@@ -70,7 +75,11 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
         if (!WaitCommEvent(pwd->hPort, &dwEvent, &overlap)) {
             ProcessCommError(pwd->hPort);
         }
-        WaitForSingleObject(overlap.hEvent, WAIT_TIME);
+        dwEvent = WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
+        if (dwEvent == WAIT_OBJECT_0 + 1) {
+            // the connection was severed
+            break;
+        }
         ClearCommError(pwd->hPort, &dwError, &cs);
         
         // ensures that there is a character at the port
