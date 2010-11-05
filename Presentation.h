@@ -2,6 +2,7 @@
 #define PRESENTATION_H
 
 #include "TerminalEmulator.h"
+#include <stdio.h>
 
 #define TAB_LENGTH  8
 #define CLR_UP      -1

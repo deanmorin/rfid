@@ -336,15 +336,18 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 }
 VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
 	DWORD i;
-	
+	CHAR temp;
+    
 	ScrollUp(hWnd);
-	MoveCursor( hWnd, 1, 1, FALSE;
+	MoveCursor( hWnd, 1, 1, FALSE);
 	for(i=0;i<dwTokenLength;i++){
 		UpdateDisplayBuf(hWnd,pcToken[i]);
 	}
 
 	for(i=0;i<dwDataLength;i++){
-		UpdateDisplayBuf(hWnd,pcData[i]);
+        temp = sprintf("%X",pcData[i]);
+        
+		UpdateDisplayBuf(hWnd,temp);
 	}
 }
 
