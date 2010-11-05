@@ -9,6 +9,7 @@
 #define CLR_LEFT    -1
 #define CLR_RIGHT   1
 
+VOID	EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength);
 VOID    Bell(HWND hWnd);
 VOID    ClearLine(HWND hWnd, UINT cxCoord, UINT cyCoord, INT iDirection);
 VOID    ClearScreen(HWND hWnd, UINT cxCoord, UINT cyCoord, INT iDirection);
