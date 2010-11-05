@@ -103,6 +103,9 @@ BOOL Connect(HWND hWnd) {
         DISPLAY_ERROR("Error creating read thread");
         return FALSE;
     }
+	
+	//request packet
+	//RequestPacket(hWnd);
 
     CUR_FG_COLOR = 7;
     CUR_BG_COLOR = 0;
@@ -157,17 +160,17 @@ VOID Disconnect(HWND hWnd) {
    
     if (!SetCommTimeouts(pwd->hPort, &pwd->defaultTimeOuts)) {
         DISPLAY_ERROR("Could not reset comm timeouts to defaults");
-    }
+    } else {
 
     // let the read thread finish up
     do {
         GetExitCodeThread(pwd->hThread, &dwThreadid);
     } while (dwThreadid == STILL_ACTIVE);
-
+	}
     CloseHandle(pwd->hThread);
     CloseHandle(pwd->hPort);
     pwd->hPort = NULL;
-
+	
     // enable/disable appropriate menu choices    
     EnableMenuItem(GetMenu(hWnd), IDM_DISCONNECT, MF_GRAYED);
     EnableMenuItem(GetMenu(hWnd), IDM_CONNECT,    MF_ENABLED);
@@ -175,6 +178,7 @@ VOID Disconnect(HWND hWnd) {
     for (i = 0; i < NO_OF_PORTS; i++) {
         EnableMenuItem(GetMenu(hWnd), IDM_COM1 + i, MF_ENABLED);
     }
+	
 }
 
 /*------------------------------------------------------------------------------
