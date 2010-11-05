@@ -291,7 +291,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	switch(pcPacket[7]){
 		case 0x04:
 			if(pcPacket[8] == 0x00 && pcPacket[9] == 0x00){
-				pcToken = "ISO 15693";
+				(pcToken , "ISO 15693");
 				dwTokenLength = strlen(pcToken);
 				dwDataLength = 8;
 				j = (dwLength - 3);
@@ -306,7 +306,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 			return;
 		case 0x05:
 			if(pcPacket[8] == 0x02 && pcPacket[9] == 0x24){
-				pcToken = "TAG-IT HF";
+				strcpy(pcToken , "TAG-IT HF");
 				dwTokenLength = strlen(pcToken);
 				dwDataLength = 4;
 				for(i = 0, j = (dwLength - 1); i < dwDataLength; i++, j--){
@@ -319,7 +319,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 			return;
 		case 0x06:
 			if(pcPacket[8] == 0xFE){
-				pcToken = "LF R/W";
+				strcpy(pcToken , "LF R/W");
 				dwTokenLength = strlen(pcToken);
 				dwDataLength = 8;
 				for(i = 0, j = (dwLength - 3); i < dwDataLength; i++, j--){
