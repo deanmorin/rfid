@@ -284,8 +284,10 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
 	/*if(DetectLRCError(hWnd, pcPacket, dwLength)){
+		DISPLAY_ERROR("Error in RFID Packet");
 		//display error packet error
 	}*/
+	
 	switch(pcPacket[7]){
 		case 0x04:
 			if(pcPacket[8] == 0x00 && pcPacket[9] == 0x00){
@@ -310,7 +312,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 				for(i = 0, j = (dwLength - 1); i < dwDataLength; i++, j--){
 					pcData[i] = pcPacket[j];
 				}
-				//EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+				EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
 			} else {
 				//display error unsupported token
 			}
@@ -323,7 +325,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 				for(i = 0, j = (dwLength - 3); i < dwDataLength; i++, j--){
 					pcData[i] = pcPacket[j];
 				}
-				//EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+				EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
 			} else {
 				//display error unsupported token
 			}
@@ -333,6 +335,25 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 			return;
 	}
 }
+VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
+	DWORD i;
+	CHAR temp;
+    
+	ScrollUp(hWnd);
+	MoveCursor( hWnd, 1, 1, FALSE);
+	for(i=0;i<dwTokenLength;i++){
+		UpdateDisplayBuf(hWnd,pcToken[i]);
+	}
+
+	for(i=0;i<dwDataLength;i++){
+        temp = sprintf("%X",pcData[i]);
+        
+		UpdateDisplayBuf(hWnd,temp);
+	}
+}
+
+
+
 
 /*------------------------------------------------------------------------------
 -- FUNCTION:    UpdateDisplayBuf
@@ -424,7 +445,7 @@ VOID Bell(HWND hWnd) {
         InvalidateRect(hWnd, NULL, TRUE);
  
     } else if (pwd->iBellSetting == IDM_BELL_AUR) {
-        PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);
+       /* PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);*/
     }
 }
 
