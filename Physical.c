@@ -93,7 +93,7 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
             if (dwBytesRead > 2) {
                 // read completed successfully
 				dwLength = psReadBuf[1];
-				if(dwBytesRead == dwLength){
+				if(dwBytesRead >= dwLength){
 					for(i = 0; i < dwLength; i++){
 						pcPacket[i] = psReadBuf[i];
 					}
