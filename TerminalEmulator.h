@@ -13,6 +13,7 @@
 #include "Physical.h"
 #include "Presentation.h"
 #include "Session.h"
+#include "ErrorDetect.h"
 
 #pragma warning(disable:4002)
 #pragma warning(disable:4996)

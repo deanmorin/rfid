@@ -6,7 +6,7 @@
 --                               is to organize the functions intuitively, 
 --                               rather than pedantically.
 --                      
--- PROGRAM:     RFID Reader Enterprise Edition
+-- PROGRAM:     RFID Reader - Enterprise Edition
 --
 -- FUNCTIONS:
 --              DWORD WINAPI    ReadThreadProc(HWND);
@@ -35,10 +35,13 @@
 -- REVISIONS:   Nov 05, 2010
 --              Modified the function to also listen for a "disconnect" event,
 --              ond to break in that case.
+--              ProcessRead() is now called once a complete packet is confirmed
+--              (as opposed to sending the contents of the buffer to 
+--              ProcessRead() as soon as they arrive.
 --
 -- DESIGNER:    Dean Morin
 --
--- PROGRAMMER:  Dean Morin
+-- PROGRAMMER:  Dean Morin, Daniel Wright
 --
 -- INTERFACE:   DWORD WINAPI ReadThreadProc(HWND hWnd)
 --                          hWnd - the handle to the window
@@ -61,6 +64,10 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     DWORD           dwError                 = 0;
     COMSTAT         cs                      = {0};
     HANDLE          hEvents[2]              = {0};
+	BOOL			requestPending 			= FALSE;
+	DWORD			dwLength 				= 0;
+	CHAR			pcPacket[20]			={0};
+	DWORD i;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
     if ((overlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL) {
@@ -75,26 +82,41 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
         if (!WaitCommEvent(pwd->hPort, &dwEvent, &overlap)) {
             ProcessCommError(pwd->hPort);
         }
+
         dwEvent = WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
         if (dwEvent == WAIT_OBJECT_0 + 1) {
             // the connection was severed
             break;
         }
+		if(!requestPending){
+			RequestPacket(hWnd);
+			requestPending = TRUE;
+		}
         ClearCommError(pwd->hPort, &dwError, &cs);
         
+		
         // ensures that there is a character at the port
-        if (cs.cbInQue) {                       
+        if (cs.cbInQue) {  
             if (!ReadFile(pwd->hPort, psReadBuf, cs.cbInQue, 
                           &dwBytesRead, &overlap)) {
                 // read is incomplete or had an error
                 ProcessCommError(pwd->hPort);
                 GetOverlappedResult(pwd->hThread, &overlap, &dwBytesRead, TRUE);
             }             
-            if (dwBytesRead) {
+            if (dwBytesRead > 2) {
                 // read completed successfully
-                ProcessRead(hWnd, psReadBuf, dwBytesRead);
+				dwLength = psReadBuf[1];
+				if(dwBytesRead >= dwLength){
+					for(i = 0; i < dwLength; i++){
+						pcPacket[i] = psReadBuf[i];
+					}
+					ProcessPacket(hWnd, pcPacket, dwLength);
+					memset(psReadBuf, 0, READ_BUFSIZE);
+					requestPending = FALSE;
+				}
                 InvalidateRect(hWnd, NULL, FALSE);
             }
+			
         }
         ResetEvent(overlap.hEvent);
     }

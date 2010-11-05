@@ -108,6 +108,51 @@ BOOL ProcessWrite(HWND hWnd, WPARAM wParam, BOOL bNonCharKey) {
     }
     return TRUE;
 }
+/*------------------------------------------------------------------------------
+-- FUNCTION:    RequestPacket
+--
+-- DATE:        Nov 4, 2010
+--
+-- REVISIONS:   (Date and Description)
+--
+-- DESIGNER:    Daniel Wright
+--
+-- PROGRAMMER:  Daniel Wright
+--
+-- INTERFACE:   BOOL RequestPacket(HWND hWnd)
+--                          hWnd        - the handle to the window
+--                          
+-- RETURNS:     True if the port write was successful.
+--
+-- NOTES:
+--              Writes a string representing a packet request to the port.
+------------------------------------------------------------------------------*/
+BOOL RequestPacket(HWND hWnd) {
+ 
+    PWNDDATA    pwd             = {0};
+    CHAR        psWriteBuf[10]   = {0};
+    OVERLAPPED  overlap         = {0};
+    DWORD       dwBytesRead     = 0;
+    UINT        bufLength       = 1;
+    pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
+
+    psWriteBuf[0] = 0x01;
+	psWriteBuf[1] = 0x09;
+	psWriteBuf[2] = 0x00;
+	psWriteBuf[3] = 0x03;
+	psWriteBuf[4] = 0x01;
+	psWriteBuf[5] = 0x41;
+	psWriteBuf[6] = 0x00; //change to 0x00 for infinite loop
+	psWriteBuf[7] = 0x4B; //update error correction
+	psWriteBuf[8] = 0xB4; //update error correction
+
+    if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
 
 /*------------------------------------------------------------------------------
 -- FUNCTION:    ProcessRead
@@ -206,6 +251,109 @@ VOID ProcessSpecialChar(HWND hWnd, CHAR cSpChar) {
         case 0x0D:  MoveCursor(hWnd, 1, Y + 1, FALSE);      break;
     }
 }
+/*------------------------------------------------------------------------------
+-- FUNCTION:    ProcessPacket
+--
+-- DATE:        Nov 4, 2010
+--
+-- REVISIONS:   (Date and Description)
+--
+-- DESIGNER:    Dean Morin
+--
+-- PROGRAMMER:  Daniel Wright
+--
+-- INTERFACE:   VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength)
+--                          hWnd    - the handle to the window
+--                          pcPacket - RFID packet
+--							dwLength - number of bytes in the RFID packet
+--
+-- RETURNS:     VOID.
+--
+-- NOTES:
+--              Calls DetectLRCError to check for errors in the packet.
+--				Calls a function to display token name and data.
+------------------------------------------------------------------------------*/
+VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
+	PWNDDATA pwd = NULL;
+	
+	CHAR pcToken[512];
+	DWORD dwTokenLength = 0;
+	CHAR pcData[512];
+	DWORD dwDataLength = 0;
+	DWORD j, i;
+	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
+
+	/*if(DetectLRCError(hWnd, pcPacket, dwLength)){
+		DISPLAY_ERROR("Error in RFID Packet");
+		//display error packet error
+	}*/
+	
+	switch(pcPacket[7]){
+		case 0x04:
+			if(pcPacket[8] == 0x00 && pcPacket[9] == 0x00){
+				pcToken = "ISO 15693";
+				dwTokenLength = strlen(pcToken);
+				dwDataLength = 8;
+				j = (dwLength - 3);
+				for(i = 0; i < dwDataLength; i++){
+					pcData[i] = pcPacket[j];
+					j--;
+				}
+				//EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+			} else {
+				//display error unsupported token
+			}
+			return;
+		case 0x05:
+			if(pcPacket[8] == 0x02 && pcPacket[9] == 0x24){
+				pcToken = "TAG-IT HF";
+				dwTokenLength = strlen(pcToken);
+				dwDataLength = 4;
+				for(i = 0, j = (dwLength - 1); i < dwDataLength; i++, j--){
+					pcData[i] = pcPacket[j];
+				}
+				EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+			} else {
+				//display error unsupported token
+			}
+			return;
+		case 0x06:
+			if(pcPacket[8] == 0xFE){
+				pcToken = "LF R/W";
+				dwTokenLength = strlen(pcToken);
+				dwDataLength = 8;
+				for(i = 0, j = (dwLength - 3); i < dwDataLength; i++, j--){
+					pcData[i] = pcPacket[j];
+				}
+				EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+			} else {
+				//display error unsupported token
+			}
+			return;
+		default:
+			//display error unsupported token
+			return;
+	}
+}
+VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
+	DWORD i;
+	CHAR temp;
+    
+	ScrollUp(hWnd);
+	MoveCursor( hWnd, 1, 1, FALSE);
+	for(i=0;i<dwTokenLength;i++){
+		UpdateDisplayBuf(hWnd,pcToken[i]);
+	}
+
+	for(i=0;i<dwDataLength;i++){
+        temp = sprintf("%X",pcData[i]);
+        
+		UpdateDisplayBuf(hWnd,temp);
+	}
+}
+
+
+
 
 /*------------------------------------------------------------------------------
 -- FUNCTION:    UpdateDisplayBuf
@@ -297,7 +445,9 @@ VOID Bell(HWND hWnd) {
         InvalidateRect(hWnd, NULL, TRUE);
  
     } else if (pwd->iBellSetting == IDM_BELL_AUR) {
-        //PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);
+
+       /* PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);*/
+
     }
 }
 
