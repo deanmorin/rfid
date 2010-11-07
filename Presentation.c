@@ -1,11 +1,10 @@
 /*------------------------------------------------------------------------------
 -- SOURCE FILE:     Presentation.c - Contains all the OSI "presentation layer"
---                                   functions for the Terminal Emulator.
+--                                   functions for the RFID reader.
 --
 -- PROGRAM:     RFID Reader - Enterprise Edition
 --
 -- FUNCTIONS:
---              BOOL    RequestPacket(HWND hWnd);
 --              VOID    UpdateDisplayBuf(HWND hWnd, CHAR cCharacter);
 --              VOID    HorizontalTab(HWND hWnd);
 --              VOID    FormFeed(HWND hWnd);
@@ -20,15 +19,12 @@
 --              VOID    SetScrollRegion(HWND hWnd, INT cyTop, INT cyBottom); 
 --              VOID    EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, 
 --                              CHAR* pcData, DWORD dwDataLength)
---              VOID    MakeColumns(VOID)
---				VOID	RequestPacket(HWND hWnd);
 --				VOID	ProcessPacket(HWND hWnd, CHAR* pcPacket, 
 --                                    DWORD dwLength);
 --
 -- DATE:        Oct 19, 2010
 --
--- REVISIONS:   November 4, 2010 - Added RequestPacket, ProcessPacket, EchoTag, 
---                  MakeColumns
+-- REVISIONS:   November 4, 2010 - ProcessPacket, EchoTag
 --              November 7, 2010 - Removed a number of unecessary functions.
 --
 -- DESIGNER:    Dean Morin
@@ -36,58 +32,12 @@
 -- PROGRAMMER:  Dean Morin
 --
 -- NOTES:
--- Contains presentation level functions for the Terminal Emulator program.
+-- Contains presentation level functions for the RFID reader.
 -- These are the functions that process the characters both typed and received
 -- into meaningful data.
 ------------------------------------------------------------------------------*/
 
 #include "Presentation.h"
-
-/*------------------------------------------------------------------------------
--- FUNCTION:    RequestPacket
---
--- DATE:        Nov 4, 2010
---
--- REVISIONS:   (Date and Description)
---
--- DESIGNER:    Daniel Wright
---
--- PROGRAMMER:  Daniel Wright
---
--- INTERFACE:   BOOL RequestPacket(HWND hWnd)
---                          hWnd        - the handle to the window
---                          
--- RETURNS:     True if the port write was successful.
---
--- NOTES:
---              Writes a string representing a packet request to the port.
-------------------------------------------------------------------------------*/
-BOOL RequestPacket(HWND hWnd) {
- 
-    PWNDDATA    pwd             = {0};
-    CHAR        psWriteBuf[10]  = {0};
-    OVERLAPPED  overlap         = {0};
-    DWORD       dwBytesRead     = 0;
-    UINT        bufLength       = 9;
-    pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
-
-    psWriteBuf[0] = 0x01;
-	psWriteBuf[1] = 0x09;
-	psWriteBuf[2] = 0x00;
-	psWriteBuf[3] = 0x03;
-	psWriteBuf[4] = 0x01;
-	psWriteBuf[5] = 0x41;
-	psWriteBuf[6] = 0x00; 
-	psWriteBuf[7] = 0x4B; 
-	psWriteBuf[8] = 0xB4; 
-
-    if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
-		if (GetLastError() != ERROR_IO_PENDING) {
-            return FALSE;
-        }
-    }
-    return TRUE;
-}
 
 /*------------------------------------------------------------------------------
 -- FUNCTION:    ProcessPacket

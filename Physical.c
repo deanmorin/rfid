@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 -- SOURCE FILE:     Physical.c - Contains all the OSI "physical layer"
---                               functions for the Intelligent Terminal
---                               Emulator. The definitions for the OSI layers
+--                               functions for the RFID reader. 
+--                               The definitions for the OSI layers
 --                               have been loosened somewhat, since the purpose 
 --                               is to organize the functions intuitively, 
 --                               rather than pedantically.
@@ -10,6 +10,7 @@
 --
 -- FUNCTIONS:
 --              DWORD WINAPI    ReadThreadProc(HWND);
+--				VOID	        RequestPacket(HWND hWnd);
 --              VOID            ProcessCommError(HANDLE);
 --
 --
@@ -17,14 +18,14 @@
 --
 -- REVISIONS:   Nov 05, 2010
 --              Modified ReadThreadProc to work more appropriately for the RFID
---              reader.
+--              reader. Added RequestPacket()
 --
 -- DESIGNER:    Dean Morin
 --
 -- PROGRAMMER:  Dean Morin, Daniel Wright
 --
 -- NOTES:
--- Contains physical level functions for the Intelligent Terminal Emulator.
+-- Contains physical level functions for the RFID reader.
 ------------------------------------------------------------------------------*/
 
 #include "Physical.h"
@@ -135,6 +136,52 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     }
     CloseHandle(overlap.hEvent);
     return 0;
+}
+
+/*------------------------------------------------------------------------------
+-- FUNCTION:    RequestPacket
+--
+-- DATE:        Nov 4, 2010
+--
+-- REVISIONS:   (Date and Description)
+--
+-- DESIGNER:    Daniel Wright
+--
+-- PROGRAMMER:  Daniel Wright
+--
+-- INTERFACE:   BOOL RequestPacket(HWND hWnd)
+--                          hWnd        - the handle to the window
+--                          
+-- RETURNS:     True if the port write was successful.
+--
+-- NOTES:
+--              Writes a string representing a packet request to the port.
+------------------------------------------------------------------------------*/
+BOOL RequestPacket(HWND hWnd) {
+ 
+    PWNDDATA    pwd             = {0};
+    CHAR        psWriteBuf[10]  = {0};
+    OVERLAPPED  overlap         = {0};
+    DWORD       dwBytesRead     = 0;
+    UINT        bufLength       = 9;
+    pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
+
+    psWriteBuf[0] = 0x01;
+	psWriteBuf[1] = 0x09;
+	psWriteBuf[2] = 0x00;
+	psWriteBuf[3] = 0x03;
+	psWriteBuf[4] = 0x01;
+	psWriteBuf[5] = 0x41;
+	psWriteBuf[6] = 0x00; 
+	psWriteBuf[7] = 0x4B; 
+	psWriteBuf[8] = 0xB4; 
+
+    if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
+		if (GetLastError() != ERROR_IO_PENDING) {
+            return FALSE;
+        }
+    }
+    return TRUE;
 }
 
 /*------------------------------------------------------------------------------

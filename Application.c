@@ -1,26 +1,27 @@
 /*------------------------------------------------------------------------------
 -- SOURCE FILE:     Application.c - Contains all the OSI "application layer"
---                                  functions for the Terminal Emulator.
+--                                  functions for the RFID reader.
 --
--- PROGRAM:     Advanced Terminal Emulator Pro
+-- PROGRAM:     RFID Reader - Enterprise Edition
 --
 -- FUNCTIONS:
 --              VOID    InitTerminal(HWND);
 --              VOID    Paint(HWND);
 --              VOID    PerformMenuAction(HWND, WPARAM);
---              VOID    SetBell(HWND, INT);
+--              VOID    MakeColumns(VOID)
 --
 --
 -- DATE:        Oct 19, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   Nov 06, 2010
+--              Removed SetBell(), added MakeColumns().
 --
 -- DESIGNER:    Dean Morin
 --
 -- PROGRAMMER:  Dean Morin
 --
 -- NOTES:
--- Contains application level functions for the Terminal Emulator program. These
+-- Contains application level functions for the RFID reader. These
 -- are the functions that deal with the program display, as well as initializing
 -- the program.
 ------------------------------------------------------------------------------*/

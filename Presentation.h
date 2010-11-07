@@ -11,7 +11,6 @@
 #define CLR_RIGHT   1
 
 
-VOID 	MakeColumns(HWND hWnd);
 VOID	EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, 
                 DWORD dwDataLength);
 VOID    ClearLine(HWND hWnd, UINT cxCoord, UINT cyCoord, INT iDirection);
@@ -23,7 +22,6 @@ VOID    ScrollDown(HWND hWnd);
 VOID    ScrollUp(HWND hWnd);
 VOID    SetScrollRegion(HWND hWnd, INT cyTop, INT cyBottom); 
 VOID    UpdateDisplayBuf(HWND hWnd, CHAR cCharacter);
-BOOL	RequestPacket(HWND hWnd);
 VOID	ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength);
 
 #endif

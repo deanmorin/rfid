@@ -3,7 +3,7 @@
 /*---------------------------------------------------------------
 -- SOURCE FILE:    ErrorDetect.c
 --
--- PROGRAM:     Advanced Terminal Emulator Pro
+-- PROGRAM:     RFID Reader - Enterprise Edition
 --
 -- FUNCTIONS:
 --              BOOL DetectLRCError(CHAR* pcPacket, DWORD dwLength)

@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------------
 -- SOURCE FILE:     Session.c   - Contains all the OSI "session layer"
---                                functions for the Terminal Emulator.
+--                                functions for the RFID reader.
 --
 -- PROGRAM:     RFID Reader - Enterprise Edition
 --
@@ -21,7 +21,7 @@
 -- PROGRAMMER:  Dean Morin, Daniel Wright
 --
 -- NOTES:
--- Contains session level functions for the Terminal Emulator program. These
+-- Contains session level functions for the RFID reader. These
 -- are the functions that deal with setting up connections and configuring the
 -- port.
 ------------------------------------------------------------------------------*/

@@ -9,5 +9,6 @@
 
 VOID            ProcessCommError(HANDLE hPort);
 DWORD WINAPI    ReadThreadProc(HWND hWnd);
+BOOL	        RequestPacket(HWND hWnd);
 
 #endif
