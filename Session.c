@@ -125,7 +125,9 @@ BOOL Connect(HWND hWnd) {
     MakeColumns(hWnd);
     
     
+
 	InitRfid(hWnd);
+
     return TRUE;
 }
 
@@ -241,9 +243,15 @@ VOID SelectPort(HWND hWnd, INT iSelected) {
 
 VOID InitRfid(HWND hWnd){
 	PWNDDATA pwd;
-	CHAR        psWriteBuf[26]   = {0x30, 0x31, 0x30, 0x41, 0x30, 0x30, 0x30, 0x33, 0x30, 0x31, 0x34,
+	CHAR        psWriteBuf1[26]   = {0x30, 0x31, 0x30, 0x41, 0x30, 0x30, 0x30, 0x33, 0x30, 0x31, 0x34,
 									0x33, 0x30, 0x36, 0x30, 0x30, 0x01, 0x0A, 0x00, 0x03, 0x01, 0x43,
 									0x06, 0x00, 0x4C, 0xB3};
+	CHAR		psWriteBuf2[8]	  = {0x01, 0x08, 0x00, 0x03, 0x01, 0x40, 0x4B, 0xB4};
+	CHAR		psWriteBuf3[9]	  = {0x01, 0x09, 0x00, 0x03, 0x01, 0x42, 0x02, 0x4A, 0xB5};
+	CHAR		psWriteBuf4[10]	  = {0x01, 0x0A, 0x00, 0x03, 0x01, 0x42, 0x02, 0x03, 0x4A, 0xB5};
+	CHAR		psWriteBuf5[11]	  = {0x01, 0x0B, 0x00, 0x03, 0x01, 0x42, 0x02, 0x03, 0x04, 0x4F, 0xB0};
+	CHAR		psWriteBuf6[12]	  = {0x01, 0x0C, 0x00, 0x03, 0x01, 0x42, 0x02, 0x03, 0x04, 0x05, 0x4D, 0xB2};
+	CHAR		psWriteBuf7[13]	  = {0x01, 0x0D, 0x00, 0x03, 0x01, 0x42, 0x02, 0x03, 0x04, 0x05, 0x06, 0x4A, 0xB5};
     OVERLAPPED  overlap         = {0};
     DWORD       dwBytesRead     = 0;
     UINT        bufLength       = 26;
@@ -252,9 +260,49 @@ VOID InitRfid(HWND hWnd){
 
 
 
-	if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
+	
+	if (!WriteFile(pwd->hPort, psWriteBuf1, bufLength, &dwBytesRead, &overlap)) {
         if (GetLastError() != ERROR_IO_PENDING) {
-            DISPLAY_ERROR("Failed to initialize RFID scanner");
+            DISPLAY_ERROR("Failed to initialize RFID reader");
         }
     }
+	/*bufLength = 8;
+	if (!WriteFile(pwd->hPort, psWriteBuf2, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            DISPLAY_ERROR("Failed to initialize RFID reader");
+        }
+    }
+	bufLength = 9;
+	if (!WriteFile(pwd->hPort, psWriteBuf3, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            DISPLAY_ERROR("Failed to initialize RFID reader");
+        }
+    }
+	bufLength = 10;
+	if (!WriteFile(pwd->hPort, psWriteBuf4, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            DISPLAY_ERROR("Failed to initialize RFID reader");
+        }
+    }
+	bufLength = 11;
+	if (!WriteFile(pwd->hPort, psWriteBuf5, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            DISPLAY_ERROR("Failed to initialize RFID reader");
+        }
+    }
+	bufLength = 12;
+	if (!WriteFile(pwd->hPort, psWriteBuf6, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            DISPLAY_ERROR("Failed to initialize RFID reader");
+        }
+    }
+	bufLength = 13;
+	if (!WriteFile(pwd->hPort, psWriteBuf7, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            DISPLAY_ERROR("Failed to initialize RFID reader");
+        }
+    }*/
+	
+	
+
 }
