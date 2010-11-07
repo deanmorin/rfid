@@ -283,12 +283,13 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	DWORD j, i;
 	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
-	if(DetectLRCError( pcPacket, dwLength)){
+	if(DetectLRCError(pcPacket, dwLength)){
 		DISPLAY_ERROR("Error in RFID Packet");
 	}
 	
 	switch(pcPacket[7]){
 		case 0x04:
+
 			strcpy(pcToken , "ISO 15693");
 			dwTokenLength = strlen(pcToken);
 			dwDataLength = 8;
@@ -332,14 +333,14 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
 	DWORD i;
 	CHAR* temp = (CHAR*)malloc(sizeof(CHAR)*dwDataLength*2);
-    
+    SetScrollRange(hWnd,2,LINES_PER_SCRN);
 	ScrollUp(hWnd);
-	MoveCursor( hWnd, 1, 1, FALSE);
+	MoveCursor( hWnd, 1, 2, FALSE);
 	for(i=0;i<dwTokenLength;i++){
 		UpdateDisplayBuf(hWnd,pcToken[i]);
 	}
-	UpdateDisplayBuf(hWnd,' ');
-	UpdateDisplayBuf(hWnd,' ');
+    MoveCursor( hWnd, 12, 2, FALSE);
+    
 	for(i=0;i<dwDataLength;i++)
 	  sprintf(temp+2*i, "%02X", (BYTE)pcData[i]);
 
@@ -350,8 +351,23 @@ VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD 
 		UpdateDisplayBuf(hWnd,temp[i]);
 		UpdateDisplayBuf(hWnd,' ');
 	}
+    SetScrollRange(hWnd,1,LINES_PER_SCRN);
 }
 
+VOID MakeColumns(VOID){
+    CHAR[10] temp1= "Token";
+    CHAR[10] temp2= "Value";
+    MoveCursor( hWnd, 1, 1, FALSE);
+    for(i=0;i<10;i++){
+        UpdateDisplayBuf(hWnd,temp1[i]);
+    }
+    MoveCursor( hWnd, 12, 1, FALSE);
+    for(i=0;i<10;i++){
+        UpdateDisplayBuf(hWnd,temp2[i]);
+    }    
+
+    
+}
 
 
 
@@ -445,7 +461,9 @@ VOID Bell(HWND hWnd) {
         InvalidateRect(hWnd, NULL, TRUE);
  
     } else if (pwd->iBellSetting == IDM_BELL_AUR) {
+
        /* PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);*/
+
     }
 }
 
