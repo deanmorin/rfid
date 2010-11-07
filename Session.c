@@ -125,9 +125,13 @@ BOOL Connect(HWND hWnd) {
     MakeColumns(hWnd);
     
     
+<<<<<<< Updated upstream
 
 	InitRfid(hWnd);
 
+=======
+	//InitRfid(hWnd);
+>>>>>>> Stashed changes
     return TRUE;
 }
 
