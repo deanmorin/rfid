@@ -54,7 +54,7 @@ BOOL Connect(HWND hWnd) {
     COMMTIMEOUTS    timeOut     = {0};
     DWORD           dwThreadid  = 0;
     DWORD           i           = 0;
-
+	
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
     // open serial port
@@ -120,10 +120,12 @@ BOOL Connect(HWND hWnd) {
     for (i = 0; i < NO_OF_PORTS; i++) {
         EnableMenuItem(GetMenu(hWnd), IDM_COM1 + i, MF_GRAYED);
     }
+
     //print out headers for Tokens and Values
     MakeColumns();
     
     
+
     return TRUE;
 }
 
@@ -233,5 +235,51 @@ VOID SelectPort(HWND hWnd, INT iSelected) {
         case IDM_COM7:  pwd->lpszCommName = TEXT("COM7");   return;        
         case IDM_COM8:  pwd->lpszCommName = TEXT("COM8");   return;        
         case IDM_COM9:  pwd->lpszCommName = TEXT("COM9");   return;
+    }
+}
+
+
+VOID InitRfid(HWND hWnd){
+	PWNDDATA pwd;
+	CHAR        psWriteBuf[26]   = {0x30, 0x31, 0x30, 0x41, 0x30, 0x30, 0x30, 0x33, 0x30, 0x31, 0x34,
+									0x33, 0x30, 0x36, 0x30, 0x30, 0x01, 0x0A, 0x00, 0x03, 0x01, 0x43,
+									0x06, 0x00, 0x4C, 0xB3};
+    OVERLAPPED  overlap         = {0};
+    DWORD       dwBytesRead     = 0;
+    UINT        bufLength       = 26;
+	pwd = (PWNDDATA)GetWindowLongPtr(hWnd, 0);
+
+
+
+	psWriteBuf[0] = 0x30;
+	psWriteBuf[1] = 0x31;
+	psWriteBuf[2] = 0x30;
+	psWriteBuf[3] = 0x41;
+	psWriteBuf[4] = 0x30;
+	psWriteBuf[5] = 0x30;
+	psWriteBuf[6] = 0x30;
+	psWriteBuf[7] = 0x33;
+	psWriteBuf[8] = 0x30;
+	psWriteBuf[9] = 0x31;
+	psWriteBuf[10] = 0x34;
+	psWriteBuf[11] = 0x33;
+	psWriteBuf[12] = 0x30;
+	psWriteBuf[13] = 0x36;
+	psWriteBuf[14] = 0x30;
+	psWriteBuf[15] = 0x30;
+	psWriteBuf[16] = 0x01;
+	psWriteBuf[17] = 0x0A;
+	psWriteBuf[18] = 0x00;
+	psWriteBuf[19] = 0x03;
+	psWriteBuf[20] = 0x01;
+	psWriteBuf[21] = 0x43;
+	psWriteBuf[22] = 0x06;
+	psWriteBuf[23] = 0x00;
+	psWriteBuf[24] = 0x4C;
+	psWriteBuf[25] = 0xB3;
+	if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
+        if (GetLastError() != ERROR_IO_PENDING) {
+            return FALSE;
+        }
     }
 }

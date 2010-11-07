@@ -37,7 +37,7 @@
 --              ond to break in that case.
 --              ProcessRead() is now called once a complete packet is confirmed
 --              (as opposed to sending the contents of the buffer to 
---              ProcessRead() as soon as they arrive.
+--              ProcessRead() as soon as they arrive).
 --
 -- DESIGNER:    Dean Morin
 --
@@ -70,14 +70,19 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     CHAR_LIST*      pHead                   = NULL;
     DWORD           dwQueueSize             = 0;
 	DWORD           i                       = 0;
+
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
+	
     if ((overlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL) {
         DISPLAY_ERROR("Error creating event in read thread");
     }
     hEvents[0] = overlap.hEvent;
     hEvents[1] = OpenEvent(DELETE | SYNCHRONIZE, FALSE, TEXT("disconnected"));
 
+
+	
+	
     while (pwd->bConnected) {
 
         SetCommMask(pwd->hPort, EV_RXCHAR);
