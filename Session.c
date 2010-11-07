@@ -159,7 +159,8 @@ VOID Disconnect(HWND hWnd) {
 
     // this will end the outer while loop in the read thread
     pwd->bConnected = FALSE;
-    hEvent = CreateEvent(NULL, TRUE, TRUE, TEXT("disconnected"));
+    hEvent = CreateEvent(NULL, TRUE, FALSE, TEXT("disconnected"));
+	SetEvent(hEvent);
    
     if (!SetCommTimeouts(pwd->hPort, &pwd->defaultTimeOuts)) {
         DISPLAY_ERROR("Could not reset comm timeouts to defaults");
