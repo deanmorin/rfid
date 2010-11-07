@@ -133,7 +133,7 @@ BOOL RequestPacket(HWND hWnd) {
     CHAR        psWriteBuf[10]   = {0};
     OVERLAPPED  overlap         = {0};
     DWORD       dwBytesRead     = 0;
-    UINT        bufLength       = 1;
+    UINT        bufLength       = 9;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
     psWriteBuf[0] = 0x01;
@@ -283,72 +283,72 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	DWORD j, i;
 	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
-	/*if(DetectLRCError(hWnd, pcPacket, dwLength)){
+	if(DetectLRCError( pcPacket, dwLength)){
 		DISPLAY_ERROR("Error in RFID Packet");
-		//display error packet error
-	}*/
+	}
 	
 	switch(pcPacket[7]){
 		case 0x04:
-			if(pcPacket[8] == 0x00 && pcPacket[9] == 0x00){
-				(pcToken , "ISO 15693");
-				dwTokenLength = strlen(pcToken);
-				dwDataLength = 8;
-				j = (dwLength - 3);
-				for(i = 0; i < dwDataLength; i++){
-					pcData[i] = pcPacket[j];
-					j--;
-				}
-				//EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
-			} else {
-				//display error unsupported token
+			strcpy(pcToken , "ISO 15693");
+			dwTokenLength = strlen(pcToken);
+			dwDataLength = 8;
+			j = (dwLength - 3);
+			for(i = 0; i < dwDataLength; i++){
+				pcData[i] = pcPacket[j];
+				j--;
 			}
+			EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
 			return;
 		case 0x05:
-			if(pcPacket[8] == 0x02 && pcPacket[9] == 0x24){
-				strcpy(pcToken , "TAG-IT HF");
-				dwTokenLength = strlen(pcToken);
-				dwDataLength = 4;
-				for(i = 0, j = (dwLength - 1); i < dwDataLength; i++, j--){
-					pcData[i] = pcPacket[j];
-				}
-				EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
-			} else {
-				//display error unsupported token
+			
+			strcpy(pcToken , "TAG-IT HF");
+			dwTokenLength = strlen(pcToken);
+			dwDataLength = 4;
+			for(i = 0, j = (dwLength - 1); i < dwDataLength; i++, j--){
+				pcData[i] = pcPacket[j];
 			}
+			EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+			
 			return;
 		case 0x06:
-			if(pcPacket[8] == 0xFE){
-				strcpy(pcToken , "LF R/W");
-				dwTokenLength = strlen(pcToken);
-				dwDataLength = 8;
-				for(i = 0, j = (dwLength - 3); i < dwDataLength; i++, j--){
-					pcData[i] = pcPacket[j];
-				}
-				EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
-			} else {
-				//display error unsupported token
+	
+			strcpy(pcToken , "LF R/W");
+			dwTokenLength = strlen(pcToken);
+			dwDataLength = 8;
+			for(i = 0, j = (dwLength - 3); i < dwDataLength; i++, j--){
+				pcData[i] = pcPacket[j];
 			}
+			EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+			
 			return;
 		default:
-			//display error unsupported token
+			strcpy(pcToken, "Unsupported Tag");
+			for(i = 0; i < strlen(pcToken); i++){
+				UpdateDisplayBuf(hWnd, pcToken[i]);
+			}
 			return;
 	}
 }
 VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
 	DWORD i;
-	CHAR temp;
+	CHAR* temp = (CHAR*)malloc(sizeof(CHAR)*dwDataLength*2);
     
 	ScrollUp(hWnd);
 	MoveCursor( hWnd, 1, 1, FALSE);
 	for(i=0;i<dwTokenLength;i++){
 		UpdateDisplayBuf(hWnd,pcToken[i]);
 	}
+	UpdateDisplayBuf(hWnd,' ');
+	UpdateDisplayBuf(hWnd,' ');
+	for(i=0;i<dwDataLength;i++)
+	  sprintf(temp+2*i, "%02X", (BYTE)pcData[i]);
 
-	for(i=0;i<dwDataLength;i++){
-        temp = sprintf("%X",pcData[i]);
-        
-		UpdateDisplayBuf(hWnd,temp);
+
+	for(i=0;i<dwDataLength*2;i++){
+      
+        UpdateDisplayBuf(hWnd,temp[i++]);
+		UpdateDisplayBuf(hWnd,temp[i]);
+		UpdateDisplayBuf(hWnd,' ');
 	}
 }
 
