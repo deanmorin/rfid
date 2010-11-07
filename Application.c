@@ -84,8 +84,7 @@ VOID InitTerminal(HWND hWnd) {
 	pwd->wordWrap			= FALSE;
 	pwd->relOrigin			= FALSE;
 
-    //print out headers for Tokens and Values
-    MakeColumns(hWnd);
+    
 
     // initialize a "blank" display buffer
     for (i = 0; i < LINES_PER_SCRN; i++) {

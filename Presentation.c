@@ -330,7 +330,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 			
 		default:
 			//Ignore response to Rfid initialization
-			if(pcPacket[1] == 0x21){
+			if(pcPacket[1] == 0x09){
 				return;
 			}
 			strcpy(pcToken, "Unsupported Tag");

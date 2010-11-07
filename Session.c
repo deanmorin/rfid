@@ -121,6 +121,8 @@ BOOL Connect(HWND hWnd) {
     for (i = 0; i < NO_OF_PORTS; i++) {
         EnableMenuItem(GetMenu(hWnd), IDM_COM1 + i, MF_GRAYED);
     }    
+	//print out headers for Tokens and Values
+    MakeColumns(hWnd);
     return TRUE;
 }
 
