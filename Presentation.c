@@ -23,11 +23,14 @@
 --              VOID    ScrollDown(HWND hWnd);
 --              VOID    ScrollUp(HWND hWnd);
 --              VOID    SetScrollRegion(HWND hWnd, INT cyTop, INT cyBottom); 
---
+--				VOID	RequestPacket(HWND hWnd);
+--				VOID	ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength);
+--				VOID	MakeColumns(HWND hWnd);
+--				VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength)
 --
 -- DATE:        Oct 19, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   November 4, 2010 - Added RequestPacket, ProcessPacket, EchoTag, MakeColumns
 --
 -- DESIGNER:    Dean Morin
 --
@@ -142,9 +145,9 @@ BOOL RequestPacket(HWND hWnd) {
 	psWriteBuf[3] = 0x03;
 	psWriteBuf[4] = 0x01;
 	psWriteBuf[5] = 0x41;
-	psWriteBuf[6] = 0x00; //change to 0x00 for infinite loop
-	psWriteBuf[7] = 0x4B; //update error correction
-	psWriteBuf[8] = 0xB4; //update error correction
+	psWriteBuf[6] = 0x00; 
+	psWriteBuf[7] = 0x4B; 
+	psWriteBuf[8] = 0xB4; 
 
     if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
         if (GetLastError() != ERROR_IO_PENDING) {
@@ -258,7 +261,7 @@ VOID ProcessSpecialChar(HWND hWnd, CHAR cSpChar) {
 --
 -- REVISIONS:   (Date and Description)
 --
--- DESIGNER:    Dean Morin
+-- DESIGNER:    Dean Morin, Marcel Vangrootheest
 --
 -- PROGRAMMER:  Daniel Wright
 --
@@ -286,6 +289,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	if(DetectLRCError(pcPacket, dwLength)){
 		DISPLAY_ERROR("Error in RFID Packet");
 	}
+	
 	
 	switch(pcPacket[7]){
 		case 0x04:
@@ -322,7 +326,13 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 			EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
 			
 			return;
+		
+			
 		default:
+			//Ignore response to Rfid initialization
+			if(pcPacket[1] == 0x21){
+				return;
+			}
 			strcpy(pcToken, "Unsupported Tag");
 			for(i = 0; i < strlen(pcToken); i++){
 				UpdateDisplayBuf(hWnd, pcToken[i]);
@@ -333,7 +343,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
 	DWORD i;
 	CHAR* temp = (CHAR*)malloc(sizeof(CHAR)*dwDataLength*2);
-    SetScrollRange(hWnd,2,LINES_PER_SCRN);
+    SetScrollRegion(hWnd,2,LINES_PER_SCRN);
 	ScrollUp(hWnd);
 	MoveCursor( hWnd, 1, 2, FALSE);
 	for(i=0;i<dwTokenLength;i++){
@@ -351,12 +361,13 @@ VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD 
 		UpdateDisplayBuf(hWnd,temp[i]);
 		UpdateDisplayBuf(hWnd,' ');
 	}
-    SetScrollRange(hWnd,1,LINES_PER_SCRN);
+    SetScrollRegion(hWnd,1,LINES_PER_SCRN);
 }
 
-VOID MakeColumns(VOID){
-    CHAR[10] temp1= "Token";
-    CHAR[10] temp2= "Value";
+VOID MakeColumns(HWND hWnd){
+    CHAR temp1[10]= "Token";
+    CHAR temp2[10]= "Value";
+	DWORD i;
     MoveCursor( hWnd, 1, 1, FALSE);
     for(i=0;i<10;i++){
         UpdateDisplayBuf(hWnd,temp1[i]);
@@ -462,7 +473,7 @@ VOID Bell(HWND hWnd) {
  
     } else if (pwd->iBellSetting == IDM_BELL_AUR) {
 
-       /* PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);*/
+//       PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);
 
     }
 }

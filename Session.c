@@ -8,16 +8,17 @@
 --              BOOL    Connect(HWND);
 --              VOID    Disconnect(HWND);
 --              VOID    SelectPort(HWND, INT);
---
+--				VOID	InitRfid(HWND);
 --
 -- DATE:        Oct 19, 2010
 --
 -- REVISIONS:   Nov 06, 2010
---              Modified Disconnect() to be more event driven.
+--              Dean    - Modified Disconnect() to be more event driven.
+--              Daniel  - Added InitRfid() and updated Connect.
 --
--- DESIGNER:    Dean Morin
+-- DESIGNER:    Dean Morin, Daniel Wright
 --
--- PROGRAMMER:  Dean Morin
+-- PROGRAMMER:  Dean Morin, Daniel Wright
 --
 -- NOTES:
 -- Contains session level functions for the Terminal Emulator program. These
@@ -32,7 +33,8 @@
 --
 -- DATE:        Oct 16, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   Nov 6, 2010 - Added initialization of rfid scanner and printing
+--								headers for token display.
 --
 -- DESIGNER:    Dean Morin
 --
@@ -94,7 +96,8 @@ BOOL Connect(HWND hWnd) {
         DISPLAY_ERROR("Could not set comm timeouts");
         return FALSE;
     }
-    
+    //Initialize Rfid scanner
+	InitRfid(hWnd);
     // create thread for reading
     pwd->hThread = CreateThread(NULL, 0,
                                 (LPTHREAD_START_ROUTINE) ReadThreadProc,
@@ -117,13 +120,7 @@ BOOL Connect(HWND hWnd) {
     EnableMenuItem(GetMenu(hWnd), IDM_COMMSET,    MF_GRAYED);
     for (i = 0; i < NO_OF_PORTS; i++) {
         EnableMenuItem(GetMenu(hWnd), IDM_COM1 + i, MF_GRAYED);
-    }
-
-    //print out headers for Tokens and Values
-    MakeColumns();
-    
-    
-
+    }    
     return TRUE;
 }
 
@@ -234,12 +231,33 @@ VOID SelectPort(HWND hWnd, INT iSelected) {
     }
 }
 
-
+/*------------------------------------------------------------------------------
+-- FUNCTION:    InitRfid
+--
+-- DATE:        Nov 6, 2010
+--
+-- REVISIONS:   (Date and Description)
+--
+-- DESIGNER:    Daniel Wright
+--
+-- PROGRAMMER:  Daniel Wright
+--
+-- INTERFACE:   VOID InitRfid(HWND hWnd)
+--                          hWnd        - the handle to the window
+--                          
+--
+-- RETURNS:     VOID.
+--
+-- NOTES:
+--              Initializes settings for the RFID scanner. Called everytime
+--				a connection is made.
+------------------------------------------------------------------------------*/
 VOID InitRfid(HWND hWnd){
 	PWNDDATA pwd;
 	CHAR        psWriteBuf[26]   = {0x30, 0x31, 0x30, 0x41, 0x30, 0x30, 0x30, 0x33, 0x30, 0x31, 0x34,
 									0x33, 0x30, 0x36, 0x30, 0x30, 0x01, 0x0A, 0x00, 0x03, 0x01, 0x43,
 									0x06, 0x00, 0x4C, 0xB3};
+	
     OVERLAPPED  overlap         = {0};
     DWORD       dwBytesRead     = 0;
     UINT        bufLength       = 26;
@@ -247,35 +265,12 @@ VOID InitRfid(HWND hWnd){
 
 
 
-	psWriteBuf[0] = 0x30;
-	psWriteBuf[1] = 0x31;
-	psWriteBuf[2] = 0x30;
-	psWriteBuf[3] = 0x41;
-	psWriteBuf[4] = 0x30;
-	psWriteBuf[5] = 0x30;
-	psWriteBuf[6] = 0x30;
-	psWriteBuf[7] = 0x33;
-	psWriteBuf[8] = 0x30;
-	psWriteBuf[9] = 0x31;
-	psWriteBuf[10] = 0x34;
-	psWriteBuf[11] = 0x33;
-	psWriteBuf[12] = 0x30;
-	psWriteBuf[13] = 0x36;
-	psWriteBuf[14] = 0x30;
-	psWriteBuf[15] = 0x30;
-	psWriteBuf[16] = 0x01;
-	psWriteBuf[17] = 0x0A;
-	psWriteBuf[18] = 0x00;
-	psWriteBuf[19] = 0x03;
-	psWriteBuf[20] = 0x01;
-	psWriteBuf[21] = 0x43;
-	psWriteBuf[22] = 0x06;
-	psWriteBuf[23] = 0x00;
-	psWriteBuf[24] = 0x4C;
-	psWriteBuf[25] = 0xB3;
+
+	
 	if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
         if (GetLastError() != ERROR_IO_PENDING) {
-            return FALSE;
+            DISPLAY_ERROR("Failed to initialize RFID reader");
         }
     }
+	
 }

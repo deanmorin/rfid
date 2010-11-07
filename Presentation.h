@@ -11,7 +11,7 @@
 #define CLR_RIGHT   1
 
 
-VOID 	MakeColumns(VOID);
+VOID 	MakeColumns(HWND hWnd);
 VOID	EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength);
 VOID    Bell(HWND hWnd);
 VOID    ClearLine(HWND hWnd, UINT cxCoord, UINT cyCoord, INT iDirection);

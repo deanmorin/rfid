@@ -84,8 +84,8 @@ VOID InitTerminal(HWND hWnd) {
 	pwd->wordWrap			= FALSE;
 	pwd->relOrigin			= FALSE;
 
-    CreateCaret(hWnd, NULL, PADDING, PADDING);
-    ShowCaret(hWnd);
+    //print out headers for Tokens and Values
+    MakeColumns(hWnd);
 
     // initialize a "blank" display buffer
     for (i = 0; i < LINES_PER_SCRN; i++) {
@@ -219,7 +219,7 @@ VOID Paint(HWND hWnd) {
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     //plf = (PLOGFONT) calloc(1, sizeof(LOGFONT));
 
-    HideCaret(hWnd);
+    //HideCaret(hWnd);
     hdc = BeginPaint(hWnd, &ps) ;
     SelectObject(hdc, pwd->displayBuf.hFont);
 
@@ -255,8 +255,8 @@ VOID Paint(HWND hWnd) {
     }
 	
     EndPaint(hWnd, &ps);
-    SetCaretPos(X_POS, Y_POS);
-    ShowCaret(hWnd);
+    //SetCaretPos(X_POS, Y_POS);
+    //ShowCaret(hWnd);
 }
 
 /*------------------------------------------------------------------------------
