@@ -82,8 +82,6 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     hEvents[0] = overlap.hEvent;
     hEvents[1] = OpenEvent(DELETE | SYNCHRONIZE, FALSE, TEXT("disconnected"));
 
-
-	
 	
     while (pwd->bConnected) {
 
@@ -121,13 +119,6 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
 
                     pcPacket = RemoveFromFront(&pHead, dwPacketLength);
 				    ProcessPacket(hWnd, pcPacket, dwPacketLength);
-
-
-
-                    //MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
-
-
-
                     memset(psReadBuf, 0, READ_BUFSIZE);
 				    requestPending = FALSE;
                     free(pcPacket);

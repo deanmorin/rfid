@@ -8,7 +8,6 @@
 #include <Windows.h>
 #include <stdio.h>
 #include "Application.h"
-#include "EscapeSequence.h"
 #include "Menu.h"
 #include "Physical.h"
 #include "Presentation.h"
@@ -88,7 +87,6 @@ typedef struct wndData {
 	BOOL			cursorMode;
     INT             cyWindowTop;
     INT             cyWindowBottom;
-    INT             iBellSetting;
 	BOOL			wordWrap;
 	BOOL			relOrigin;
 } WNDDATA, *PWNDDATA;

@@ -76,7 +76,6 @@ VOID InitTerminal(HWND hWnd) {
     // initialize variables in PWDDATA struct to defaults
     pwd->bConnected         = FALSE;
     pwd->psIncompleteEsc    = NULL;
-    pwd->iBellSetting       = IDM_BELL_DIS;
     CHAR_WIDTH              = tm.tmAveCharWidth;
     CHAR_HEIGHT             = tm.tmHeight;
     CUR_FG_COLOR            = 7;
@@ -176,10 +175,6 @@ VOID PerformMenuAction(HWND hWnd, WPARAM wParam) {
                 DISPLAY_ERROR("The comm settings dialogue failed.\nThis port may not exist");
             }
 		    return;
-
-        case IDM_BELL_DIS:  SetBell(hWnd, IDM_BELL_DIS);    return;
-        case IDM_BELL_VIS:  SetBell(hWnd, IDM_BELL_VIS);    return;
-        case IDM_BELL_AUR:  SetBell(hWnd, IDM_BELL_AUR);    return;
         
         default:
             return;
@@ -217,9 +212,7 @@ VOID Paint(HWND hWnd) {
     UINT            tempbgColor = 0;
 	UINT            tempStyle	= 0;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
-    //plf = (PLOGFONT) calloc(1, sizeof(LOGFONT));
 
-    //HideCaret(hWnd);
     hdc = BeginPaint(hWnd, &ps) ;
     SelectObject(hdc, pwd->displayBuf.hFont);
 
@@ -240,13 +233,7 @@ VOID Paint(HWND hWnd) {
             if (CHARACTER(j, i).bgColor != tempbgColor) {
 	            SetBkColor(hdc, TXT_COLOURS[CHARACTER(j, i).bgColor]);
                 tempbgColor = CHARACTER(j, i).bgColor;
-            }/*
-            if (CHARACTER(j, i).style != tempStyle) {
-				GetObject(pwd->displayBuf.hFont, sizeof(LOGFONT), plf);
-				plf->lfUnderline = CHARACTER(j, i).style;
-				SelectObject(hdc, CreateFontIndirect(plf));
-				tempStyle	= CUR_STYLE;
-            }*/
+            }
 
             a[0] = CHARACTER(j, i).character;
             TextOut(hdc, CHAR_WIDTH * j + PADDING, CHAR_HEIGHT * i + PADDING,
@@ -255,35 +242,4 @@ VOID Paint(HWND hWnd) {
     }
 	
     EndPaint(hWnd, &ps);
-    //SetCaretPos(X_POS, Y_POS);
-    //ShowCaret(hWnd);
-}
-
-/*------------------------------------------------------------------------------
--- FUNCTION:    SetBell
---
--- DATE:        Oct 19, 2010
---
--- REVISIONS:   (Date and Description)
---
--- DESIGNER:    Dean Morin
---
--- PROGRAMMER:  Dean Morin
---
--- INTERFACE:   VOID SetBell(HWND hWnd, INT iSelected)
---                          hWnd        - the handle to the window
---                          iSelected   - the bell mode to use
---
--- RETURNS:     VOID.
---
--- NOTES:
---              Sets the bell mode based on the argument iSelect. It can be set
---              to off, visual (flash), or aural (beeps) modes.
-------------------------------------------------------------------------------*/
-VOID SetBell(HWND hWnd, INT iSelected) {
-    PWNDDATA pwd;
-    pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
-    CheckMenuItem(GetMenu(hWnd), pwd->iBellSetting, MF_UNCHECKED);
-    CheckMenuItem(GetMenu(hWnd), iSelected,         MF_CHECKED);
-    pwd->iBellSetting = iSelected;
 }
