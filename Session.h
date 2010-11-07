@@ -1,7 +1,7 @@
 #ifndef SESSION_H
 #define SESSION_H
 
-#include "TerminalEmulator.h"
+#include "Main.h"
 
 BOOL    Connect(HWND hWnd);
 VOID    Disconnect(HWND hWnd);

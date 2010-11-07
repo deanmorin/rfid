@@ -1,7 +1,7 @@
 #ifndef PRESENTATION_H
 #define PRESENTATION_H
 
-#include "TerminalEmulator.h"
+#include "Main.h"
 #include <stdio.h>
 
 #define TAB_LENGTH  8

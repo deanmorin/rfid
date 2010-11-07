@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
--- SOURCE FILE:     TerminalEmulator.c - Contains the WinMain() and WinProc()
+-- SOURCE FILE:     Main.c - Contains the WinMain() and WinProc()
 --                                       functions for the Intelligent Terminal
 --                                       Emulator.
 --                      
@@ -24,7 +24,7 @@
 -- The main entry point for the program.
 ------------------------------------------------------------------------------*/
 
-#include "TerminalEmulator.h"
+#include "Main.h"
 
 /*------------------------------------------------------------------------------
 -- FUNCTION:    WinMain
@@ -59,7 +59,7 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    PSTR szCmdLine, int iCmdShow) {
                 
-    static TCHAR    szAppName[] = TEXT("TerminalEmulator");
+    static TCHAR    szAppName[] = TEXT("Main");
     HWND            hWnd        = NULL;
     MSG             msg         = {0};
     WNDCLASS        wndclass    = {0};

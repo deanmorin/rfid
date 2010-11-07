@@ -2,7 +2,7 @@
 #define PHYSICAL_H
 
 #include "List.h"
-#include "TerminalEmulator.h"
+#include "Main.h"
 
 #define READ_BUFSIZE    2048
 #define WAIT_TIME       100

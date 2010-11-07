@@ -47,11 +47,11 @@
 
 				1. XOR the first byte with the second byte, then the result of 
 					that with the third byte, and so on until all bytes except 
-					for the final two have been XORâ€™d. 
+					for the final two have been XOR’d. 
 				2. If the result of this is not the same as the second to last 
 					byte: 
 					A. return true 
-				3. XOR the second to last byte with â€˜FFâ€™ 
+				3. XOR the second to last byte with ‘FF’ 
 				4. If the result of this is not the same as the last byte: 
 					A. return true 
 				5. return false 
