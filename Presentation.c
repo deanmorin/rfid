@@ -177,42 +177,6 @@ VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData,
     SetScrollRegion(hWnd,1,LINES_PER_SCRN);
 }
 
-
-/*------------------------------------------------------------------------------
--- FUNCTION:    MakeColumns
---
--- DATE:        Nov 6, 2010
---
--- REVISIONS:   (Date and Description)
---
--- DESIGNER:    Ian Lee
---
--- PROGRAMMER:  Ian Lee
---
--- INTERFACE:   VOID MakeColumns(VOID)
---
---
--- RETURNS:     VOID.
---
--- NOTES:
---              Prints Column Headers "Token" and "Value"
---
-------------------------------------------------------------------------------*/
-VOID MakeColumns(HWND hWnd){
-    CHAR temp1[10]= "Token";
-    CHAR temp2[10]= "Value";
-	DWORD i;
-
-    MoveCursor( hWnd, 1, 1, FALSE);
-    for(i=0;i<10;i++){
-        UpdateDisplayBuf(hWnd,temp1[i]);
-    }
-    MoveCursor( hWnd, 12, 1, FALSE);
-    for(i=0;i<10;i++){
-        UpdateDisplayBuf(hWnd,temp2[i]);
-    }    
-}
-
 /*------------------------------------------------------------------------------
 -- FUNCTION:    UpdateDisplayBuf
 --
