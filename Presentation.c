@@ -23,10 +23,11 @@
 --              VOID    ScrollDown(HWND hWnd);
 --              VOID    ScrollUp(HWND hWnd);
 --              VOID    SetScrollRegion(HWND hWnd, INT cyTop, INT cyBottom); 
+--              VOID    EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, 
+--                                CHAR* pcData, DWORD dwDataLength)
+--              VOID    MakeColumns(VOID)
 --				VOID	RequestPacket(HWND hWnd);
 --				VOID	ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength);
---				VOID	MakeColumns(HWND hWnd);
---				VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength)
 --
 -- DATE:        Oct 19, 2010
 --
@@ -340,6 +341,33 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 			return;
 	}
 }
+
+/*------------------------------------------------------------------------------
+-- FUNCTION:    EchoTag
+--
+-- DATE:        Nov 5, 2010
+--
+-- REVISIONS:   (Date and Description)
+--
+-- DESIGNER:    Ian Lee, Marcel Vangrootheest
+--
+-- PROGRAMMER:  Ian Lee
+--
+-- INTERFACE:   VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, 
+                        CHAR* pcData, DWORD dwDataLength)
+--                          hWnd            - the handle to the window
+--                          pcToken         - RFID Token
+--                          dwTokenLength   - number of bytes in the RFID Token
+--                          pcData          - RFID data
+--                          dwDataLength    - number of bytes in the RFID data
+--
+-- RETURNS:     VOID.
+--
+-- NOTES:
+--              Scrolls currently displayed tags down and prints tag to top 
+--              of list
+--
+------------------------------------------------------------------------------*/
 VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
 	DWORD i;
 	CHAR* temp = (CHAR*)malloc(sizeof(CHAR)*dwDataLength*2);
@@ -364,10 +392,33 @@ VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD 
     SetScrollRegion(hWnd,1,LINES_PER_SCRN);
 }
 
+
+/*------------------------------------------------------------------------------
+-- FUNCTION:    MakeColumns
+--
+-- DATE:        Nov 6, 2010
+--
+-- REVISIONS:   (Date and Description)
+--
+-- DESIGNER:    Ian Lee
+--
+-- PROGRAMMER:  Ian Lee
+--
+-- INTERFACE:   VOID MakeColumns(VOID)
+--
+--
+-- RETURNS:     VOID.
+--
+-- NOTES:
+--              Prints Column Headers "Token" and "Value"
+--
+------------------------------------------------------------------------------*/
+
 VOID MakeColumns(HWND hWnd){
     CHAR temp1[10]= "Token";
     CHAR temp2[10]= "Value";
 	DWORD i;
+
     MoveCursor( hWnd, 1, 1, FALSE);
     for(i=0;i<10;i++){
         UpdateDisplayBuf(hWnd,temp1[i]);
