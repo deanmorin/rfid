@@ -376,11 +376,7 @@ VOID MakeColumns(HWND hWnd){
     for(i=0;i<10;i++){
         UpdateDisplayBuf(hWnd,temp2[i]);
     }    
-
-    
 }
-
-
 
 /*------------------------------------------------------------------------------
 -- FUNCTION:    UpdateDisplayBuf

@@ -83,9 +83,7 @@ VOID InitTerminal(HWND hWnd) {
     WINDOW_BOTTOM           = LINES_PER_SCRN -1;
 	pwd->wordWrap			= FALSE;
 	pwd->relOrigin			= FALSE;
-
     
-
     // initialize a "blank" display buffer
     for (i = 0; i < LINES_PER_SCRN; i++) {
         pwd->displayBuf.rows[i] = (PLINE) calloc(1, sizeof(LINE));
@@ -117,6 +115,9 @@ VOID InitTerminal(HWND hWnd) {
     FillMemory(&pwd->cc.dcb, sizeof(DCB), 0);
     pwd->cc.dcb.DCBlength = sizeof(DCB);
     BuildCommDCB((LPCWSTR)"96,N,8,1", &pwd->cc.dcb);
+
+    //print out headers for Tokens and Values
+    MakeColumns(hWnd);
 }
 
 /*------------------------------------------------------------------------------
