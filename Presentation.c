@@ -283,10 +283,9 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	DWORD j, i;
 	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
-	/*if(DetectLRCError(hWnd, pcPacket, dwLength)){
+	if(DetectLRCError(pcPacket, dwLength)){
 		DISPLAY_ERROR("Error in RFID Packet");
-		//display error packet error
-	}*/
+	}
 	
 	switch(pcPacket[7]){
 		case 0x04:
@@ -299,7 +298,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 					pcData[i] = pcPacket[j];
 					j--;
 				}
-				//EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
+				EchoTag(hWnd, pcToken, dwTokenLength, pcData, dwDataLength);
 			} else {
 				//display error unsupported token
 			}

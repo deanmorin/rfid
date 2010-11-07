@@ -55,7 +55,7 @@
 --              at the port by that time. This function uses overlapped I/O.
 ------------------------------------------------------------------------------*/
 DWORD WINAPI ReadThreadProc(HWND hWnd) {
-
+    
     PWNDDATA        pwd                     = NULL;
     CHAR            psReadBuf[READ_BUFSIZE] = {0};
     OVERLAPPED      overlap                 = {0};
@@ -65,9 +65,11 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     COMSTAT         cs                      = {0};
     HANDLE          hEvents[2]              = {0};
 	BOOL			requestPending 			= FALSE;
-	DWORD			dwLength 				= 0;
-	CHAR			pcPacket[20]			={0};
-	DWORD i;
+	DWORD			dwPacketLength 			= 0;
+	CHAR*			pcPacket			    = NULL;
+    CHAR_LIST*      pHead                   = NULL;
+    DWORD           dwQueueSize             = 0;
+	DWORD           i                       = 0;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
     if ((overlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL) {
@@ -102,21 +104,23 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
                 // read is incomplete or had an error
                 ProcessCommError(pwd->hPort);
                 GetOverlappedResult(pwd->hThread, &overlap, &dwBytesRead, TRUE);
-            }             
-            if (dwBytesRead > 2) {
-                // read completed successfully
-				dwLength = psReadBuf[1];
-				if(dwBytesRead >= dwLength){
-					for(i = 0; i < dwLength; i++){
-						pcPacket[i] = psReadBuf[i];
-					}
-					ProcessPacket(hWnd, pcPacket, dwLength);
-					memset(psReadBuf, 0, READ_BUFSIZE);
-					requestPending = FALSE;
-				}
+            }
+
+            dwQueueSize = AddToBack(&pHead, psReadBuf, dwBytesRead);
+            if (dwQueueSize >= 2) {
+                dwPacketLength = GetFromList(pHead, 2);
+            
+                if (dwQueueSize >= dwPacketLength) {
+
+                    pcPacket = RemoveFromFront(&pHead, dwPacketLength);
+				    //ProcessPacket(hWnd, pcPacket, dwPacketLength);
+                    MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
+                    memset(psReadBuf, 0, READ_BUFSIZE);
+				    requestPending = FALSE;
+                    free(pcPacket);
+			    }
                 InvalidateRect(hWnd, NULL, FALSE);
             }
-			
         }
         ResetEvent(overlap.hEvent);
     }
