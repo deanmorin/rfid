@@ -2,7 +2,7 @@
 -- SOURCE FILE:     Session.c   - Contains all the OSI "session layer"
 --                                functions for the Terminal Emulator.
 --
--- PROGRAM:     Advanced Terminal Emulator Pro
+-- PROGRAM:     RFID Reader - Enterprise Edition
 --
 -- FUNCTIONS:
 --              BOOL    Connect(HWND);
@@ -12,7 +12,8 @@
 --
 -- DATE:        Oct 19, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   Nov 06, 2010
+--              Modified Disconnect() to be more event driven.
 --
 -- DESIGNER:    Dean Morin
 --
@@ -104,9 +105,6 @@ BOOL Connect(HWND hWnd) {
         return FALSE;
     }
 	
-	//request packet
-	//RequestPacket(hWnd);
-
     CUR_FG_COLOR = 7;
     CUR_BG_COLOR = 0;
     CUR_STYLE    = 0;
@@ -134,7 +132,8 @@ BOOL Connect(HWND hWnd) {
 --
 -- DATE:        Oct 16, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   Nov 16, 2010
+--              This function now creates and signals the event "disconnected".
 --
 -- DESIGNER:    Dean Morin
 --
@@ -163,8 +162,7 @@ VOID Disconnect(HWND hWnd) {
 
     // this will end the outer while loop in the read thread
     pwd->bConnected = FALSE;
-    hEvent = CreateEvent(NULL, TRUE, FALSE, TEXT("disconnected"));
-    SetEvent(hEvent);
+    hEvent = CreateEvent(NULL, TRUE, TRUE, TEXT("disconnected"));
    
     if (!SetCommTimeouts(pwd->hPort, &pwd->defaultTimeOuts)) {
         DISPLAY_ERROR("Could not reset comm timeouts to defaults");
@@ -176,8 +174,6 @@ VOID Disconnect(HWND hWnd) {
     } while (dwThreadid == STILL_ACTIVE);
 
     ResetEvent(hEvent);
-    //CloseHandle(hEvent);
-
     CloseHandle(pwd->hThread);
     CloseHandle(pwd->hPort);
     pwd->hPort = NULL;
