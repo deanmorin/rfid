@@ -133,7 +133,7 @@ BOOL RequestPacket(HWND hWnd) {
     CHAR        psWriteBuf[10]   = {0};
     OVERLAPPED  overlap         = {0};
     DWORD       dwBytesRead     = 0;
-    UINT        bufLength       = 1;
+    UINT        bufLength       = 9;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
     psWriteBuf[0] = 0x01;
@@ -283,13 +283,13 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	DWORD j, i;
 	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
-	if(DetectLRCError(hWnd, pcPacket, dwLength)){
+	if(DetectLRCError( pcPacket, dwLength)){
 		DISPLAY_ERROR("Error in RFID Packet");
 	}
 	
 	switch(pcPacket[7]){
 		case 0x04:
-			(pcToken , "ISO 15693");
+			strcpy(pcToken , "ISO 15693");
 			dwTokenLength = strlen(pcToken);
 			dwDataLength = 8;
 			j = (dwLength - 3);
@@ -331,18 +331,24 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 }
 VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
 	DWORD i;
-	CHAR temp;
+	CHAR* temp = (CHAR*)malloc(sizeof(CHAR)*dwDataLength*2);
     
 	ScrollUp(hWnd);
 	MoveCursor( hWnd, 1, 1, FALSE);
 	for(i=0;i<dwTokenLength;i++){
 		UpdateDisplayBuf(hWnd,pcToken[i]);
 	}
+	UpdateDisplayBuf(hWnd,' ');
+	UpdateDisplayBuf(hWnd,' ');
+	for(i=0;i<dwDataLength;i++)
+	  sprintf(temp+2*i, "%02X", (BYTE)pcData[i]);
 
-	for(i=0;i<dwDataLength;i++){
-        temp = sprintf("%X",pcData[i]);
-        
-		UpdateDisplayBuf(hWnd,temp);
+
+	for(i=0;i<dwDataLength*2;i++){
+      
+        UpdateDisplayBuf(hWnd,temp[i++]);
+		UpdateDisplayBuf(hWnd,temp[i]);
+		UpdateDisplayBuf(hWnd,' ');
 	}
 }
 
