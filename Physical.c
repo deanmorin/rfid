@@ -6,7 +6,7 @@
 --                               is to organize the functions intuitively, 
 --                               rather than pedantically.
 --                      
--- PROGRAM:     Advanced Terminal Emulator Pro
+-- PROGRAM:     RFID Reader - Enterprise Edition
 --
 -- FUNCTIONS:
 --              DWORD WINAPI    ReadThreadProc(HWND);
@@ -32,11 +32,16 @@
 --
 -- DATE:        Oct 13, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   Nov 05, 2010
+--              Modified the function to also listen for a "disconnect" event,
+--              ond to break in that case.
+--              ProcessRead() is now called once a complete packet is confirmed
+--              (as opposed to sending the contents of the buffer to 
+--              ProcessRead() as soon as they arrive.
 --
 -- DESIGNER:    Dean Morin
 --
--- PROGRAMMER:  Dean Morin
+-- PROGRAMMER:  Dean Morin, Daniel Wright
 --
 -- INTERFACE:   DWORD WINAPI ReadThreadProc(HWND hWnd)
 --                          hWnd - the handle to the window
@@ -50,7 +55,7 @@
 --              at the port by that time. This function uses overlapped I/O.
 ------------------------------------------------------------------------------*/
 DWORD WINAPI ReadThreadProc(HWND hWnd) {
-
+    
     PWNDDATA        pwd                     = NULL;
     CHAR            psReadBuf[READ_BUFSIZE] = {0};
     OVERLAPPED      overlap                 = {0};
@@ -58,15 +63,20 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
     DWORD           dwEvent                 = 0;
     DWORD           dwError                 = 0;
     COMSTAT         cs                      = {0};
+    HANDLE          hEvents[2]              = {0};
 	BOOL			requestPending 			= FALSE;
-	DWORD			dwLength 				= 0;
-	CHAR			pcPacket[20]			={0};
-	DWORD i;
+	DWORD			dwPacketLength 			= 0;
+	CHAR*			pcPacket			    = NULL;
+    CHAR_LIST*      pHead                   = NULL;
+    DWORD           dwQueueSize             = 0;
+	DWORD           i                       = 0;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
     if ((overlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL) {
         DISPLAY_ERROR("Error creating event in read thread");
     }
+    hEvents[0] = overlap.hEvent;
+    hEvents[1] = OpenEvent(DELETE | SYNCHRONIZE, FALSE, TEXT("disconnected"));
 
     while (pwd->bConnected) {
 
@@ -74,11 +84,16 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
         if (!WaitCommEvent(pwd->hPort, &dwEvent, &overlap)) {
             ProcessCommError(pwd->hPort);
         }
+
+        dwEvent = WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
+        if (dwEvent == WAIT_OBJECT_0 + 1) {
+            // the connection was severed
+            break;
+        }
 		if(!requestPending){
 			RequestPacket(hWnd);
 			requestPending = TRUE;
 		}
-        WaitForSingleObject(overlap.hEvent, WAIT_TIME);
         ClearCommError(pwd->hPort, &dwError, &cs);
         
 		
@@ -89,21 +104,23 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
                 // read is incomplete or had an error
                 ProcessCommError(pwd->hPort);
                 GetOverlappedResult(pwd->hThread, &overlap, &dwBytesRead, TRUE);
-            }             
-            if (dwBytesRead > 2) {
-                // read completed successfully
-				dwLength = psReadBuf[1];
-				if(dwBytesRead >= dwLength){
-					for(i = 0; i < dwLength; i++){
-						pcPacket[i] = psReadBuf[i];
-					}
-					ProcessPacket(hWnd, pcPacket, dwLength);
-					memset(psReadBuf, 0, READ_BUFSIZE);
-					requestPending = FALSE;
-				}
+            }
+
+            dwQueueSize = AddToBack(&pHead, psReadBuf, dwBytesRead);
+            if (dwQueueSize >= 2) {
+                dwPacketLength = GetFromList(pHead, 2);
+            
+                if (dwQueueSize >= dwPacketLength) {
+
+                    pcPacket = RemoveFromFront(&pHead, dwPacketLength);
+				    //ProcessPacket(hWnd, pcPacket, dwPacketLength);
+                    MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
+                    memset(psReadBuf, 0, READ_BUFSIZE);
+				    requestPending = FALSE;
+                    free(pcPacket);
+			    }
                 InvalidateRect(hWnd, NULL, FALSE);
             }
-			
         }
         ResetEvent(overlap.hEvent);
     }

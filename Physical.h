@@ -1,6 +1,7 @@
 #ifndef PHYSICAL_H
 #define PHYSICAL_H
 
+#include "List.h"
 #include "TerminalEmulator.h"
 
 #define READ_BUFSIZE    1024

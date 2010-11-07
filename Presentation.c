@@ -283,12 +283,13 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 	DWORD j, i;
 	pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
 
-	if(DetectLRCError( pcPacket, dwLength)){
+	if(DetectLRCError(pcPacket, dwLength)){
 		DISPLAY_ERROR("Error in RFID Packet");
 	}
 	
 	switch(pcPacket[7]){
 		case 0x04:
+
 			strcpy(pcToken , "ISO 15693");
 			dwTokenLength = strlen(pcToken);
 			dwDataLength = 8;
@@ -445,7 +446,9 @@ VOID Bell(HWND hWnd) {
         InvalidateRect(hWnd, NULL, TRUE);
  
     } else if (pwd->iBellSetting == IDM_BELL_AUR) {
+
        /* PlaySound(beeps[rand() % 6], NULL, SND_FILENAME | SND_ASYNC);*/
+
     }
 }
 

@@ -3,7 +3,7 @@
 --                                       functions for the Intelligent Terminal
 --                                       Emulator.
 --                      
--- PROGRAM:     Advanced Terminal Emulator Pro
+-- PROGRAM:     RFID Reader - Enterprise Edition
 --
 -- FUNCTIONS:
 --              int     WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, int)
@@ -80,7 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
     hWnd = CreateWindow(szAppName,
-                        TEXT("Advanced Terminal Emulator Pro (Trial Expired)"), 
+                        TEXT("RFID Reader - Enterprise Edition (Trial Expired)"), 
                         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU 
                         | WS_MINIMIZEBOX,
                         CW_USEDEFAULT, CW_USEDEFAULT,
