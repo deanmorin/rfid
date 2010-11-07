@@ -15,11 +15,13 @@
 --
 -- DATE:        Oct 13, 2010
 --
--- REVISIONS:   (Date and Description)
+-- REVISIONS:   Nov 05, 2010
+--              Modified ReadThreadProc to work more appropriately for the RFID
+--              reader.
 --
 -- DESIGNER:    Dean Morin
 --
--- PROGRAMMER:  Dean Morin
+-- PROGRAMMER:  Dean Morin, Daniel Wright
 --
 -- NOTES:
 -- Contains physical level functions for the Intelligent Terminal Emulator.
@@ -34,7 +36,7 @@
 --
 -- REVISIONS:   Nov 05, 2010
 --              Modified the function to also listen for a "disconnect" event,
---              ond to break in that case.
+--              and to break in that case.
 --              ProcessRead() is now called once a complete packet is confirmed
 --              (as opposed to sending the contents of the buffer to 
 --              ProcessRead() as soon as they arrive).
@@ -89,16 +91,16 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
         if (!WaitCommEvent(pwd->hPort, &dwEvent, &overlap)) {
             ProcessCommError(pwd->hPort);
         }
-
+		if(!requestPending){
+			RequestPacket(hWnd);
+			requestPending = TRUE;
+		}
         dwEvent = WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
         if (dwEvent == WAIT_OBJECT_0 + 1) {
             // the connection was severed
             break;
         }
-		if(!requestPending){
-			RequestPacket(hWnd);
-			requestPending = TRUE;
-		}
+		
         ClearCommError(pwd->hPort, &dwError, &cs);
         
 		
@@ -118,8 +120,14 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
                 if (dwQueueSize >= dwPacketLength) {
 
                     pcPacket = RemoveFromFront(&pHead, dwPacketLength);
-				    //ProcessPacket(hWnd, pcPacket, dwPacketLength);
-                    MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
+				    ProcessPacket(hWnd, pcPacket, dwPacketLength);
+
+
+
+                    //MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
+
+
+
                     memset(psReadBuf, 0, READ_BUFSIZE);
 				    requestPending = FALSE;
                     free(pcPacket);

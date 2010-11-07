@@ -4,7 +4,7 @@
 #include "List.h"
 #include "TerminalEmulator.h"
 
-#define READ_BUFSIZE    1024
+#define READ_BUFSIZE    2048
 #define WAIT_TIME       100
 
 VOID            ProcessCommError(HANDLE hPort);

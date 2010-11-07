@@ -84,8 +84,7 @@ VOID InitTerminal(HWND hWnd) {
 	pwd->wordWrap			= FALSE;
 	pwd->relOrigin			= FALSE;
 
-    //CreateCaret(hWnd, NULL, PADDING, PADDING);
-    //ShowCaret(hWnd);
+    
 
     // initialize a "blank" display buffer
     for (i = 0; i < LINES_PER_SCRN; i++) {
