@@ -84,23 +84,23 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
 
 	
     while (pwd->bConnected) {
+		
+		if(!requestPending){
+			RequestPacket(hWnd);
+			requestPending = TRUE;
+		}
 
         SetCommMask(pwd->hPort, EV_RXCHAR);
         if (!WaitCommEvent(pwd->hPort, &dwEvent, &overlap)) {
             ProcessCommError(pwd->hPort);
         }
-		if(!requestPending){
-			RequestPacket(hWnd);
-			requestPending = TRUE;
-		}
         dwEvent = WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
         if (dwEvent == WAIT_OBJECT_0 + 1) {
             // the connection was severed
             break;
         }
-		
-        ClearCommError(pwd->hPort, &dwError, &cs);
-        
+	
+        ClearCommError(pwd->hPort, &dwError, &cs);    
 		
         // ensures that there is a character at the port
         if (cs.cbInQue) {  

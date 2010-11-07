@@ -82,7 +82,7 @@ BOOL RequestPacket(HWND hWnd) {
 	psWriteBuf[8] = 0xB4; 
 
     if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
-        if (GetLastError() != ERROR_IO_PENDING) {
+		if (GetLastError() != ERROR_IO_PENDING) {
             return FALSE;
         }
     }
