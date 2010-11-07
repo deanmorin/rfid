@@ -37,7 +37,7 @@
 --              ond to break in that case.
 --              ProcessRead() is now called once a complete packet is confirmed
 --              (as opposed to sending the contents of the buffer to 
---              ProcessRead() as soon as they arrive.
+--              ProcessRead() as soon as they arrive).
 --
 -- DESIGNER:    Dean Morin
 --
