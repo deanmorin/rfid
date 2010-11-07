@@ -122,10 +122,10 @@ BOOL Connect(HWND hWnd) {
     }
 
     //print out headers for Tokens and Values
-    MakeColumns();
+    MakeColumns(hWnd);
     
     
-
+	InitRfid(hWnd);
     return TRUE;
 }
 
@@ -251,35 +251,10 @@ VOID InitRfid(HWND hWnd){
 
 
 
-	psWriteBuf[0] = 0x30;
-	psWriteBuf[1] = 0x31;
-	psWriteBuf[2] = 0x30;
-	psWriteBuf[3] = 0x41;
-	psWriteBuf[4] = 0x30;
-	psWriteBuf[5] = 0x30;
-	psWriteBuf[6] = 0x30;
-	psWriteBuf[7] = 0x33;
-	psWriteBuf[8] = 0x30;
-	psWriteBuf[9] = 0x31;
-	psWriteBuf[10] = 0x34;
-	psWriteBuf[11] = 0x33;
-	psWriteBuf[12] = 0x30;
-	psWriteBuf[13] = 0x36;
-	psWriteBuf[14] = 0x30;
-	psWriteBuf[15] = 0x30;
-	psWriteBuf[16] = 0x01;
-	psWriteBuf[17] = 0x0A;
-	psWriteBuf[18] = 0x00;
-	psWriteBuf[19] = 0x03;
-	psWriteBuf[20] = 0x01;
-	psWriteBuf[21] = 0x43;
-	psWriteBuf[22] = 0x06;
-	psWriteBuf[23] = 0x00;
-	psWriteBuf[24] = 0x4C;
-	psWriteBuf[25] = 0xB3;
+
 	if (!WriteFile(pwd->hPort, psWriteBuf, bufLength, &dwBytesRead, &overlap)) {
         if (GetLastError() != ERROR_IO_PENDING) {
-            return FALSE;
+            DISPLAY_ERROR("Failed to initialize RFID scanner");
         }
     }
 }

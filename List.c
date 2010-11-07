@@ -13,14 +13,15 @@ DWORD AddToBack(CHAR_LIST** pHead, CHAR* psBuf, DWORD dwLength) {
         newNode->c      = psBuf[i++];
         newNode->next   = NULL;
         p               = newNode;
-        *pHead = p;
+        *pHead			= newNode;
     } else {
-        dwCount++;
+
         while (p->next != NULL) {
             p = p->next;
             dwCount++;
         }
     }
+	dwCount++;
         
     for (i; i < dwLength; i++) {
         newNode         = (CHAR_LIST*) malloc(sizeof(CHAR_LIST));

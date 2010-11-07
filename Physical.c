@@ -89,16 +89,16 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
         if (!WaitCommEvent(pwd->hPort, &dwEvent, &overlap)) {
             ProcessCommError(pwd->hPort);
         }
-
+		if(!requestPending){
+			RequestPacket(hWnd);
+			requestPending = TRUE;
+		}
         dwEvent = WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
         if (dwEvent == WAIT_OBJECT_0 + 1) {
             // the connection was severed
             break;
         }
-		if(!requestPending){
-			RequestPacket(hWnd);
-			requestPending = TRUE;
-		}
+		
         ClearCommError(pwd->hPort, &dwError, &cs);
         
 		
@@ -118,8 +118,8 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
                 if (dwQueueSize >= dwPacketLength) {
 
                     pcPacket = RemoveFromFront(&pHead, dwPacketLength);
-				    //ProcessPacket(hWnd, pcPacket, dwPacketLength);
-                    MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
+				    ProcessPacket(hWnd, pcPacket, dwPacketLength);
+                    //MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
                     memset(psReadBuf, 0, READ_BUFSIZE);
 				    requestPending = FALSE;
                     free(pcPacket);
