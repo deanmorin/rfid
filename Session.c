@@ -126,9 +126,13 @@ BOOL Connect(HWND hWnd) {
     
     
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 	InitRfid(hWnd);
 
+=======
+	//InitRfid(hWnd);
+>>>>>>> Stashed changes
 =======
 	//InitRfid(hWnd);
 >>>>>>> Stashed changes
@@ -263,7 +267,10 @@ VOID InitRfid(HWND hWnd){
 
 
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 	
 	if (!WriteFile(pwd->hPort, psWriteBuf1, bufLength, &dwBytesRead, &overlap)) {
         if (GetLastError() != ERROR_IO_PENDING) {

@@ -119,11 +119,15 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
 
                     pcPacket = RemoveFromFront(&pHead, dwPacketLength);
 				    ProcessPacket(hWnd, pcPacket, dwPacketLength);
+<<<<<<< Updated upstream
 
 
                     //MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
 
 
+=======
+                    MessageBox(NULL, TEXT("AAN"), TEXT(""), MB_OK);
+>>>>>>> Stashed changes
                     memset(psReadBuf, 0, READ_BUFSIZE);
 				    requestPending = FALSE;
                     free(pcPacket);
