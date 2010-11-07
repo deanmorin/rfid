@@ -62,12 +62,18 @@ DWORD WINAPI ReadThreadProc(HWND hWnd) {
 	DWORD			dwLength 				= 0;
 	CHAR			pcPacket[20]			={0};
 	DWORD i;
+	BYTE        psWriteBuf[26]   = {0};
+	UINT        bufLength       = 26;
     pwd = (PWNDDATA) GetWindowLongPtr(hWnd, 0);
     
+	
     if ((overlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)) == NULL) {
         DISPLAY_ERROR("Error creating event in read thread");
     }
 
+
+	
+	
     while (pwd->bConnected) {
 
         SetCommMask(pwd->hPort, EV_RXCHAR);
