@@ -333,7 +333,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD dwDataLength){
 	DWORD i;
 	CHAR* temp = (CHAR*)malloc(sizeof(CHAR)*dwDataLength*2);
-    
+    SetScrollRange(hWnd,2,LINES_PER_SCRN);
 	ScrollUp(hWnd);
 	MoveCursor( hWnd, 1, 2, FALSE);
 	for(i=0;i<dwTokenLength;i++){
@@ -351,6 +351,7 @@ VOID EchoTag(HWND hWnd, CHAR* pcToken, DWORD dwTokenLength, CHAR* pcData, DWORD 
 		UpdateDisplayBuf(hWnd,temp[i]);
 		UpdateDisplayBuf(hWnd,' ');
 	}
+    SetScrollRange(hWnd,1,LINES_PER_SCRN);
 }
 
 VOID MakeColumns(VOID){
