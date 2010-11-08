@@ -256,7 +256,8 @@ VOID Paint(HWND hWnd) {
 --
 -- PROGRAMMER:  Ian Lee
 --
--- INTERFACE:   VOID MakeColumns(VOID)
+-- INTERFACE:   VOID MakeColumns(HWND hWnd)
+--                              hWnd - handle to the window
 --
 --
 -- RETURNS:     VOID.
