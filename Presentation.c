@@ -119,9 +119,9 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 				return;
 			}
 			strcpy(pcToken, "Unsupported Tag");
-			for(i = 0; i < strlen(pcToken); i++){
-				UpdateDisplayBuf(hWnd, pcToken[i]);
-			}
+			
+			EchoTag(hWnd, pcToken,15,null,0);
+			
 			return;
 	}
 }
