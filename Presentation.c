@@ -120,7 +120,7 @@ VOID ProcessPacket(HWND hWnd, CHAR* pcPacket, DWORD dwLength){
 			}
 			strcpy(pcToken, "Unsupported Tag");
 			
-			EchoTag(hWnd, pcToken,15,null,0);
+			EchoTag(hWnd, pcToken,15,NULL,0);
 			
 			return;
 	}
